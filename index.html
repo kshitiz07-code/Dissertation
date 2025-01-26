@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Banking Chatbot | बैंकिङ च्याटबोट</title>
+    <style>
+        /* Include your CSS styles here */
+        /* General Page Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #e3f2fd, #bbdefb);
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #003366;
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        header p {
+            margin: 0;
+            font-style: italic;
+            color: #cce7ff;
+        }
+
+        .chat-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-container form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .chat-container input[type="text"] {
+            width: 90%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border-radius: 25px;
+            border: 1px solid #ccc;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        .chat-container button {
+            background-color: #003366;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            margin: 0.5rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .chat-container button:hover {
+            background-color: #001f4d;
+        }
+
+        .response-container {
+            margin-top: 2rem;
+            text-align: left;
+        }
+
+        .response-container p {
+            margin: 0.5rem 0;
+            font-size: 1rem;
+        }
+
+        .response-container audio {
+            margin-top: 1rem;
+            width: 100%;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: #003366;
+            color: white;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Banking Chatbot | बैंकिङ च्याटबोट</h1>
+        <p>Your AI-powered assistant for seamless banking | तपाईंको सहज बैंकिङका लागि एआई-संचालित सहायक</p>
+    </header>
+    <main>
+        <div class="chat-container">
+            <form id="chat-form" action="/" method="POST">
+                <input id="query-input" type="text" name="query" placeholder="Type your query or speak... | यहाँ आफ्नो प्रश्न लेख्नुहोस् वा बोल्नुहोस्..." required>
+                <div>
+                    <button type="submit">Send | पठाउनुहोस्</button>
+                    <button type="button" id="voice-button">Voice Input | आवाज इनपुट</button>
+                </div>
+            </form>
+            {% if user_input %}
+            <div class="response-container">
+                <p><strong>You:</strong> {{ user_input }}</p>
+                <p><strong>Bot (English):</strong> {{ response['en'] }}</p>
+                <p><strong>Bot (Nepali):</strong> {{ response['ne'] }}</p>
+                <p><strong>English Voice:</strong></p>
+                <audio controls>
+                    <source src="{{ url_for('static', filename='en_output.mp3') }}" type="audio/mpeg">
+                </audio>
+                <p><strong>Nepali Voice:</strong></p>
+                <audio controls>
+                    <source src="{{ url_for('static', filename='ne_output.mp3') }}" type="audio/mpeg">
+                </audio>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 Banking Chatbot. All rights reserved. | © २०२४ बैंकिङ च्याटबोट। सबै अधिकार सुरक्षित।</p>
+    </footer>
+    <script>
+        // Voice Input Functionality
+        const voiceButton = document.getElementById('voice-button');
+        const queryInput = document.getElementById('query-input');
+
+        voiceButton.addEventListener('click', () => {
+            // Check for browser support
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                const recognition = new SpeechRecognition();
+                recognition.lang = 'en-US'; // Change to 'ne-NP' for Nepali
+
+                recognition.onstart = function() {
+                    voiceButton.textContent = 'Listening...';
+                };
+
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    queryInput.value = transcript;
+                };
+
+                recognition.onerror = function(event) {
+                    alert('Error occurred in recognition: ' + event.error);
+                };
+
+                recognition.onend = function() {
+                    voiceButton.textContent = 'Voice Input | आवाज इनपुट';
+                };
+
+                recognition.start();
+            } else {
+                alert('Your browser does not support voice input.');
+            }
+        });
+    </script>
+</body>
+</html>
